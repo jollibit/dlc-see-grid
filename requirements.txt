@@ -1,0 +1,9 @@
+websockets
+httpx
+pytest
+fastapi
+uvicorn
+sqlalchemy
+pydantic[dotenv]
+pyzmq
+paho-mqtt

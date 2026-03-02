@@ -1,0 +1,26 @@
+precision highp float;
+
+varying vec2 vUV;
+uniform sampler2D heatTexture;
+
+void main(void) {
+
+    // read heat value
+    float h = texture2D(heatTexture, vUV).r; // 0..1
+
+    // apply color ramp
+    vec3 color;
+    if (h < 0.1) {
+        discard; // invisible for very low values
+    } else if (h < 0.4) {
+        color = mix(vec3(0.0,1.0,1.0), vec3(1.0,1.0,0.0), (h-0.1)/0.3); // cyan → yellow
+    } else {
+        color = mix(vec3(1.0,1.0,0.0), vec3(1.0,0.0,0.0), (h-0.4)/0.6); // yellow → red
+    }
+
+    // optional hologram glow: alpha proportional to heat
+    float alpha = smoothstep(0.1, .85, h) * 0.7 + 0.3; // 0.3..1.0
+
+    gl_FragColor = vec4(color, alpha);
+
+}

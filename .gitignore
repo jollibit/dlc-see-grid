@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Local database / data files
+data.db
+
+# OS / temporary files
+Thumbs.db
+*.bak
+*.tmp
+
+# Python packaging
+build/
+dist/
+*.spec
+
+# Environment / secrets
+.env
+*.env
+
+# Docker
+*.pid
+*.tar
+*.log
+
+# Babylon-related Tools & Temp
+/.tmp/
+/temp/
+/.cache/
+
+# SSL certificates (DO NOT COMMIT)
+cert.pem
+key.pem
+server.key
+server.crt
+*.pem
+*.crt

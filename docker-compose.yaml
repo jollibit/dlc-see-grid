@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: dlc-see-web
+    command: bash -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 & python -m app.db_interface"
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      DBI_PULL: tcp://0.0.0.0:5556
+
+  bridge:
+    build: .
+    container_name: dlc-see-bridge
+    command: python -m workers.bridge
+    depends_on:
+      - web
+    restart: unless-stopped
+    environment:
+      BRIDGE_PULL: tcp://0.0.0.0:5555
+      DBI_PUSH: tcp://web:5556
+
+  # ── activated with: --profile simulator ───────────────────────────────────
+  simulator:
+    build: .
+    container_name: dlc-see-simulator
+    command: python -m workers.simulator
+    profiles:
+      - simulator
+    depends_on:
+      - bridge
+    restart: unless-stopped
+    environment:
+      BRIDGE_PUSH: tcp://bridge:5555
+
+  # ── activated with: --profile connector ───────────────────────────────────
+  connector:
+    build: .
+    container_name: dlc-see-connector
+    command: python -m workers.connector
+    profiles:
+      - connector
+    depends_on:
+      - bridge
+    restart: unless-stopped
+    environment:
+      BRIDGE_PUSH: tcp://bridge:5555
+      MQTT_BROKER: ${MQTT_BROKER:-localhost}
+      MQTT_PORT: ${MQTT_PORT:-1883}
+      MQTT_TOPIC: ${MQTT_TOPIC:-robots/#}
+      MQTT_USER: ${MQTT_USER:-}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-}
+      PAYLOAD_MODE: ${PAYLOAD_MODE:-json}
+      ANCHOR: ${ANCHOR:-CORNER}

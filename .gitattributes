@@ -1,0 +1,34 @@
+# Enforce LF for web files
+*.js     text eol=lf
+*.ts     text eol=lf
+*.css    text eol=lf
+*.html   text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+
+# Images treated as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+
+# 3D assets (Babylon, glTF, textures)
+*.babylon binary
+*.glb binary
+*.gltf binary
+*.bin binary
+*.dds binary
+*.env binary
+*.ktx2 binary
+
+# Certificates as binary
+*.pem binary
+*.crt binary
+*.key binary
+
+# Prevent CRLF corruption for python
+*.py text eol=lf
+
+# Keep Windows batch files with CRLF
+*.bat text eol=crlf
