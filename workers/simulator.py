@@ -88,6 +88,9 @@ def main():
                 'dx': dx,
                 'dy': dy,
                 'dz': dz,
+                'rx': 0,
+                'ry': 0,
+                'rz': 0,
                 'ts': datetime.now(timezone.utc).isoformat(),
                 'anchor': ANCHOR
             }

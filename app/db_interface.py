@@ -12,7 +12,7 @@ class DBInterface:
     # -----------------------------
     # Robot Interface
     # -----------------------------
-    def add_robot(self, x, y, z, name=None, status=None, hall=None, dx=None, dy=None, dz=None,timestamp=None, anchor=None):
+    def add_robot(self, x, y, z, name=None, status=None, hall=None, dx=None, dy=None, dz=None, rx=None, ry=None, rz=None, timestamp=None, anchor=None):
         session: Session = self.session_factory()
         try:
             if timestamp is None:
@@ -28,6 +28,7 @@ class DBInterface:
                 name=name, hall=hall, status=status,
                 x=x, y=y, z=z,
                 dx=dx, dy=dy, dz=dz,
+                rx=rx, ry=ry, rz=rz,
                 anchor=anchor,
             )
 
@@ -38,7 +39,7 @@ class DBInterface:
         finally:
             session.close()
 
-    def update_robot(self, robot_id, status=None, x=None, y=None, z=None, dx=None, dy=None, dz=None, timestamp=None, anchor=None):
+    def update_robot(self, robot_id, status=None, x=None, y=None, z=None, dx=None, dy=None, dz=None, rx=None, ry=None, rz=None, timestamp=None, anchor=None):
         session: Session = self.session_factory()
         try:
             robot = session.query(Robot).filter(Robot.id == robot_id).first()
@@ -52,6 +53,9 @@ class DBInterface:
             if dx is not None: robot.dx = dx
             if dy is not None: robot.dy = dy
             if dz is not None: robot.dz = dz
+            if rx is not None: robot.rx = rx
+            if ry is not None: robot.ry = ry
+            if rz is not None: robot.rz = rz
             if timestamp is not None: robot.timestamp = timestamp
 
             session.commit()
@@ -129,6 +133,9 @@ def main():
                     data['dx'],
                     data['dy'],
                     data['dz'],
+                    data['rx'],
+                    data['ry'],
+                    data['rz'],
                     datetime.fromisoformat(data['ts']),
                     data['anchor']
                 )

@@ -22,6 +22,11 @@ class Robot(Base):
     dy = Column(Float, nullable=True)
     dz = Column(Float, nullable=True)
 
+    # Rotation
+    rx = Column(Float, nullable=True)
+    ry = Column(Float, nullable=True)
+    rz = Column(Float, nullable=True)
+
     # Anchor Reference
     anchor = Column(String, nullable=False)
 
@@ -38,6 +43,9 @@ class Robot(Base):
             "dx": self.dx,
             "dy": self.dy,
             "dz": self.dz,
+            "rx": self.rx,
+            "ry": self.ry,
+            "rz": self.rz,
             "anchor": self.anchor
         }
 

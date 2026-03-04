@@ -16,6 +16,9 @@ class RobotBase(BaseModel):
     dx: Optional[float] = None
     dy: Optional[float] = None
     dz: Optional[float] = None
+    rx: Optional[float] = None
+    ry: Optional[float] = None
+    rz: Optional[float] = None
     anchor: str
 
 class RobotCreate(RobotBase):
@@ -37,6 +40,9 @@ class RobotClosestOut(BaseModel):
     dx: Optional[float] = None
     dy: Optional[float] = None
     dz: Optional[float] = None
+    rx: Optional[float] = None
+    ry: Optional[float] = None
+    rz: Optional[float] = None
     anchor: Optional[str] = None
     id: Optional[int] = None
 
