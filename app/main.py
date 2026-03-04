@@ -74,7 +74,7 @@ def read_closest_robot(
 
 @app.post("/robots", response_model=schemas.RobotOut)
 def create_item(item: schemas.RobotCreate, db: Session = Depends(get_db)):
-    db_item = models.Robot(timestamp=item.timestamp, name=item.name, status=item.status, hall=item.hall, x=item.x, y=item.y, z=item.z, dx=item.dx, dy=item.dy, dz=item.dz, rx=item.x, ry=item.y, rz=item.z, anchor=item.anchor)
+    db_item = models.Robot(timestamp=item.timestamp, name=item.name, status=item.status, hall=item.hall, x=item.x, y=item.y, z=item.z, dx=item.dx, dy=item.dy, dz=item.dz, angle=item.angle, anchor=item.anchor)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)

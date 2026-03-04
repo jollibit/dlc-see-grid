@@ -23,9 +23,7 @@ class Robot(Base):
     dz = Column(Float, nullable=True)
 
     # Rotation
-    rx = Column(Float, nullable=True)
-    ry = Column(Float, nullable=True)
-    rz = Column(Float, nullable=True)
+    angle = Column(Float, nullable=True)
 
     # Anchor Reference
     anchor = Column(String, nullable=False)
@@ -43,9 +41,7 @@ class Robot(Base):
             "dx": self.dx,
             "dy": self.dy,
             "dz": self.dz,
-            "rx": self.rx,
-            "ry": self.ry,
-            "rz": self.rz,
+            "angle": self.angle,
             "anchor": self.anchor
         }
 
