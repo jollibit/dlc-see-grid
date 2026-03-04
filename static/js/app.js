@@ -11,7 +11,7 @@ import { UIController } from "./Controller/UIController.js";
 
 const canvas = document.getElementById("renderCanvas");
 
-const engine = new BABYLON.Engine(canvas, true);
+const engine = new BABYLON.Engine(canvas, true, { adaptToDeviceRatio: true, renderEvenInBackground: true });
 
 const scene = await createScene(engine);
 
