@@ -18,23 +18,16 @@ export class Robot{
             "AGILOX.glb",
             this.scene
         );
-        console.log(result);
 
-        this.meshes = result.meshes; // store array
+        this.meshes = result.meshes;
         this.mesh = new BABYLON.TransformNode(`robotRoot_${this.id}`, this.scene);
 
-        // Parent all imported meshes to a root for easier transforms
         this.meshes.forEach(mesh => {
             mesh.parent = this.mesh;
+            const mat = mesh.material || new BABYLON.StandardMaterial(`robotMat`, this.scene);
+            mat.maxSimultaneousLights = 10;
+            mesh.material = mat;
         });
-
-        // Example: attach label & light to root
-        
-        /*
-        const mat = this.mesh.material || new BABYLON.StandardMaterial(`robotMat`, this.scene);
-        mat.maxSimultaneousLights = 10;
-        this.mesh.material = mat;
-        */
 
         this.light = new BABYLON.SpotLight(
             `robotLight_${this.id}`,               
@@ -48,7 +41,7 @@ export class Robot{
         this.light.intensity = 5;
         this.light.parent = this.mesh;
 
-        this.light.position = new BABYLON.Vector3(0, 5, 0);
+        this.light.position = new BABYLON.Vector3(0, 3, 0);
 
         const ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 

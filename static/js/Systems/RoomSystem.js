@@ -15,9 +15,18 @@ export class RoomSystem{
             this.scene
             );
 
-            this.room = result.meshes[0];
-            this.room.position = new BABYLON.Vector3(0, 0, 0);
+        const meshes = result.meshes;
+        this.room = new BABYLON.TransformNode(`room`, this.scene);
+        
+        meshes.forEach(mesh => {
+            mesh.setParent(this.room, true);
+            const mat = mesh.material || new BABYLON.StandardMaterial(`roomMat`, this.scene);
+            mat.maxSimultaneousLights = 10;
+            mesh.material = mat;
+        });
+        
+        this.room.position = new BABYLON.Vector3(0, 0, 0);
 
-            this.anchor = result.meshes.find(m => m.name.startsWith("anchor_"));
+        this.anchor = result.meshes.find(m => m.name.startsWith("anchor_"));
     }
 }
