@@ -28,7 +28,7 @@ export async function createScene(engine) {
 
   scene.metadata = { shadowGenerator };
 
-  const axes = new BABYLON.AxesViewer(scene, 2);
+  //const axes = new BABYLON.AxesViewer(scene, 2);
   
   return scene;
 };
