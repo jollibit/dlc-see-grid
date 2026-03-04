@@ -4,6 +4,7 @@ export class UIController {
         this.robots = robots;
         this.grid = grid;
         this.root = null;
+        this.touchInitialDistance = null;
     }
 
     init() {
@@ -13,6 +14,31 @@ export class UIController {
 
         this.viewController.onViewsChanged((views) => {
             this._createSidebar(views);
+        });
+
+        window.addEventListener("touchstart", (e) => {
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                this.touchInitialDistance = Math.hypot(dx, dy);
+            }
+        });
+
+        window.addEventListener("touchmove", (e) => {
+            if (e.touches.length === 2 && this.touchInitialDistance) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const currentDistance = Math.hypot(dx, dy);
+
+                const zoomFactor = currentDistance / this.touchInitialDistance;
+                viewController.zoomOverview(zoomFactor);
+
+                this.touchInitialDistance = currentDistance; // reset for smooth zoom
+            }
+        });
+
+        window.addEventListener("touchend", (e) => {
+            if (e.touches.length < 2) this.touchInitialDistance = null;
         });
 
         window.addEventListener("keydown", (event) => {
