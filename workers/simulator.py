@@ -1,5 +1,6 @@
 import zmq
 import time
+import math
 from datetime import datetime, timezone
 import random
 import os
@@ -26,6 +27,7 @@ for name in robot_names:
         'x': x,
         'y': Y,
         'z': z,
+        'angle': 0,
         'status': 'ok',
         'state_timer': 0  # countdown until next status change
     }
@@ -35,19 +37,7 @@ for name in robot_names:
 
 def update_robot(robot_state):
     # Check if robot is in warning or error and has timer
-    if robot_state['state_timer'] > 0:
-        robot_state['state_timer'] -= 1
-        # If error, robot does not move
-        if robot_state['status'] == 'error':
-            return 0, 0, 0
-        # If warning, robot moves slowly
-        elif robot_state['status'] == 'warning':
-            dx, dz = random.uniform(-0.2, 0.2), random.uniform(-0.2, 0.2)
-            x = max(MIN_X, min(MAX_X, robot_state['x'] + dx))
-            z = max(MIN_Z, min(MAX_Z, robot_state['z'] + dz))
-            robot_state['x'], robot_state['z'] = x, z
-            return dx, 0, dz
-    else:
+    if robot_state['state_timer'] <= 0:
         # Random chance to enter warning or error
         chance = random.random()
         if chance < 0.05:
@@ -58,13 +48,36 @@ def update_robot(robot_state):
             robot_state['state_timer'] = random.randint(2, 5)  # lasts 2-5 seconds
         else:
             robot_state['status'] = 'ok'
+    else: 
+        robot_state['state_timer'] -= 1
 
-    # Normal movement for 'ok'
-    dx, dz = random.uniform(-1, 1), random.uniform(-1, 1)
+    dx = 0
+    dy = 0
+    dz = 0
+    angle = 0
+
+    if robot_state['status'] == 'error':
+        dx, dy, dz = 0, 0, 0
+
+    elif robot_state['status'] == 'warning':
+        dx, dz = random.uniform(-0.2, 0.2), random.uniform(-0.2, 0.2)
+
+    elif robot_state['status'] == 'ok':   
+        dx, dz = random.uniform(-1, 1), random.uniform(-1, 1)
+
     x = max(MIN_X, min(MAX_X, robot_state['x'] + dx))
     z = max(MIN_Z, min(MAX_Z, robot_state['z'] + dz))
     robot_state['x'], robot_state['z'] = x, z
-    return dx, 0, dz
+
+    if dx != 0 or dz != 0:
+        angle_rad = math.atan2(dx, dz)
+        angle = math.degrees(angle_rad)
+    else:
+        angle = robot_state['angle']
+
+    robot_state['angle'] = angle
+
+    return dx, dy, dz, angle
 
 
 def main():
@@ -77,7 +90,7 @@ def main():
 
     while True:
         for name, state in robots.items():
-            dx, dy, dz = update_robot(state)
+            dx, dy, dz, angle = update_robot(state)
             data = {
                 'x': state['x'],
                 'y': state['y'],
@@ -88,7 +101,7 @@ def main():
                 'dx': dx,
                 'dy': dy,
                 'dz': dz,
-                'angle': 0,
+                'angle': angle,
                 'ts': datetime.now(timezone.utc).isoformat(),
                 'anchor': ANCHOR
             }
@@ -103,7 +116,7 @@ def main():
             print(
                 f"Robot {name} | status={state['status']} "
                 f"x={state['x']:.2f}, z={state['z']:.2f}, "
-                f"dx={dx:.2f}, dz={dz:.2f}, timer={state['state_timer']}"
+                f"dx={dx:.2f}, dz={dz:.2f}, angle={angle}, timer={state['state_timer']}"
             )
         time.sleep(1)
 

@@ -94,8 +94,8 @@ export class RobotSystem {
 
             if (robot){    
                 const target = new BABYLON.Vector3(data.x, data.y, data.z);
-                const angle = data.angle;
-                robot.move(target, angle, dt);
+                const radAngle = BABYLON.Tools.ToRadians(data.angle)
+                robot.move(target, radAngle, dt);
                 robot.setStatus(data.status);
             }
         });

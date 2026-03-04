@@ -74,9 +74,11 @@ export class Robot{
         current.x += dx * dt;
         current.y += dy * dt;
         current.z += dz * dt;
-
+        
         const targetQuat = BABYLON.Quaternion.FromEulerAngles(0, targetAngle, 0);
+        this.mesh.rotationQuaternion = targetQuat;
 
+        /*
         if (!this.mesh.rotationQuaternion) {
             this.mesh.rotationQuaternion = BABYLON.Quaternion.Identity();
         }
@@ -87,6 +89,7 @@ export class Robot{
             dt,
             this.mesh.rotationQuaternion
         );
+        */
     }
 
     setStatus(status){
