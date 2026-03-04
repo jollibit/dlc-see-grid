@@ -94,7 +94,8 @@ export class RobotSystem {
 
             if (robot){    
                 const target = new BABYLON.Vector3(data.x, data.y, data.z);
-                robot.move(target, dt);
+                const angle = data.angle;
+                robot.move(target, angle, dt);
                 robot.setStatus(data.status);
             }
         });

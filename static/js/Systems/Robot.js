@@ -62,7 +62,7 @@ export class Robot{
         this.mesh.position = position;
     }
 
-    move(target, dt){
+    move(target, targetAngle, dt){
         if(!this.isInit) return;
 
         const current = this.mesh.position;
@@ -75,10 +75,18 @@ export class Robot{
         current.y += dy * dt;
         current.z += dz * dt;
 
-        if (dx !== 0 || dz !== 0) {
-            const targetAngle = Math.atan2(dx, dz);
-            this.mesh.rotationQuaternion = BABYLON.Quaternion.FromEulerAngles(0, targetAngle, 0);
+        const targetQuat = BABYLON.Quaternion.FromEulerAngles(0, targetAngle, 0);
+
+        if (!this.mesh.rotationQuaternion) {
+            this.mesh.rotationQuaternion = BABYLON.Quaternion.Identity();
         }
+
+        BABYLON.Quaternion.SlerpToRef(
+            this.mesh.rotationQuaternion,
+            targetQuat,
+            dt,
+            this.mesh.rotationQuaternion
+        );
     }
 
     setStatus(status){
