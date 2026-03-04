@@ -75,7 +75,7 @@ export class CameraSystem {
     update(dt) {
         if (!this.followTarget) return;
 
-        const targetPos = this.followTarget.getBoundingInfo().boundingBox.centerWorld;
+        const targetPos = this.followTarget.absolutePosition;
 
         const desiredPos = new BABYLON.Vector3(
             targetPos.x,
