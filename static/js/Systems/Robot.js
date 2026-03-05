@@ -27,6 +27,8 @@ export class Robot{
             const mat = mesh.material || new BABYLON.StandardMaterial(`robotMat`, this.scene);
             mat.maxSimultaneousLights = 10;
             mesh.material = mat;
+            this.scene.metadata.shadowGenerator.addShadowCaster(mesh, true);
+            mesh.receiveShadows = true;
         });
 
         this.light = new BABYLON.SpotLight(

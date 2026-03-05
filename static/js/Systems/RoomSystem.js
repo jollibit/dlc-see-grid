@@ -11,7 +11,7 @@ export class RoomSystem{
         const result = await BABYLON.SceneLoader.ImportMeshAsync(
             "",
             "models/",
-            "New_HM26.glb",
+            "HM26.glb",
             this.scene
             );
 
@@ -23,8 +23,16 @@ export class RoomSystem{
             const mat = mesh.material || new BABYLON.StandardMaterial(`roomMat`, this.scene);
             mat.maxSimultaneousLights = 10;
             mesh.material = mat;
+            this.scene.metadata.shadowGenerator.addShadowCaster(mesh, true);
+
+            mesh.receiveShadows = true;
+            mesh.getChildMeshes().forEach(child => {
+                child.receiveShadows = true;
+            });
         });
         
+        console.log(result.meshes.find(m => m.name.startsWith("floor")));
+
         this.room.position = new BABYLON.Vector3(0, 0, 0);
 
         this.anchor = result.meshes.find(m => m.name.startsWith("anchor_"));
