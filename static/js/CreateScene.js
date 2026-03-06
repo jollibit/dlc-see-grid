@@ -29,34 +29,35 @@ export async function createScene(engine) {
 
   let dirLight = new BABYLON.DirectionalLight(
     "dirLight",
-    new BABYLON.Vector3(-1, -1, -1),
+    new BABYLON.Vector3(0, -2, 1),
     scene
   );
 
-  dirLight.position = new BABYLON.Vector3(-50, 10, -50);
+  dirLight.position = new BABYLON.Vector3(0, 1000, 0);
   dirLight.intensity = 1.5;
 
-  const shadowGenerator = new BABYLON.ShadowGenerator(2048, dirLight);
-  shadowGenerator.useBlurExponentialShadowMap = true;
+  const shadowGenerator = new BABYLON.CascadedShadowGenerator(2048, dirLight);
+  shadowGenerator.numCascades = 6;
+  shadowGenerator.useAutoCalcShadowZBounds = false;
+
+  shadowGenerator.useContactHardeningShadow = true;
+  shadowGenerator.filter = BABYLON.ShadowGenerator.FILTER_PCF;
+  shadowGenerator.filterPCFType = BABYLON.ShadowGenerator.PCF_TYPE_HARD; 
+  shadowGenerator.forceBackFacesOnly = true;
+
+  shadowGenerator.bias = 0.0005;
+  shadowGenerator.normalBias = 0.02;
+
+  
+  shadowGenerator.setDarkness(0.25);
+  
+  shadowGenerator.shadowMinZ = 1;
+  shadowGenerator.shadowMaxZ = 1000;
+  
   shadowGenerator.blurKernel = 32;
-
-  shadowGenerator.setDarkness(0.5); // optional
-  shadowGenerator.forceBackFacesOnly = true; // optional
-
-  // Adjust frustum for directional light
-  shadowGenerator.useContactHardeningShadow = true; // nicer
 
   scene.metadata = { shadowGenerator };
 
-  /*
-  const cube = BABYLON.MeshBuilder.CreateBox("cube", { size: 2 }, scene);
-  cube.position.y = 1;
-  scene.metadata.shadowGenerator.addShadowCaster(cube);
-
-  const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 10, height: 10 }, scene);
-  ground.position.y = .5;
-  ground.receiveShadows = true;
-  */
   //const axes = new BABYLON.AxesViewer(scene, 2);
   
   return scene;
