@@ -85,15 +85,12 @@ export class UIController {
         timeline.className = "timeline";
         timeline.innerHTML = "";
 
-        const header = document.createElement("h4");
-        header.textContent = "Timeline";
-        timeline.appendChild(header);
-
         // Timestamp input
         const timestampInput = document.createElement("input");
-        timestampInput.type = "datetime-local"; // lets user pick date + time
-        timestampInput.style.width = "60%";
-        timestampInput.style.marginRight = "5px";
+        timestampInput.type = "datetime-local";
+        timestampInput.style.width = "180px";   // fixed width
+        timestampInput.style.height = "35px";   // readable height
+        timestampInput.style.marginLeft = "5px";
 
         timestampInput.addEventListener("change", () => {
             const tsValue = timestampInput.value;
@@ -107,41 +104,21 @@ export class UIController {
         secondsInput.type = "number";
         secondsInput.min = "1";
         secondsInput.value = "60"; // default
-        secondsInput.style.width = "30%";
-        secondsInput.style.marginRight = "5px";
+        secondsInput.style.width = "80px";      // smaller input
+        secondsInput.style.height = "35px";
+        secondsInput.style.marginLeft = "5px";
 
         secondsInput.addEventListener("change", () => {
             const secValue = parseInt(secondsInput.value, 10);
             this.grid.setTimespan(secValue);
         });
 
-        // Button to set timespan
-        const divTimespan = document.createElement("djv");
-        const setTimespanBtn = document.createElement("button");
-        setTimespanBtn.textContent = "Set Timespan";
-        setTimespanBtn.className = "btn btn-sm btn-outline-success";
-        setTimespanBtn.addEventListener("click", () => {
-            const tsValue = timestampInput.value;
-            const secValue = parseInt(secondsInput.value, 10);
-            if (!tsValue || !secValue) return;
-
-            const timestamp = new Date(tsValue);
-            this.grid.setTimespan(timestamp, secValue);
-            this.robots.showPointInTime(timestamp);
-        });
-
-        divTimespan.appendChild(timestampInput);
-        divTimespan.appendChild(secondsInput);
-        timeline.appendChild(divTimespan);
-
-        // --- Live button ---
-        const divLive = document.createElement("div");
-        divLive.style.marginBottom = "5px";
-
         const liveBtn = document.createElement("button");
-        liveBtn.textContent = "Set Live";
-        liveBtn.className = "btn btn-sm btn-outline-success";
-        liveBtn.style.width = "100%";
+        liveBtn.textContent = "Live";
+        liveBtn.className = "btn btn-sm btn-success";
+        liveBtn.style.width = "90px";           // wide enough for text
+        liveBtn.style.height = "35px";
+        liveBtn.style.marginLeft = "5px";
 
         liveBtn.addEventListener("click", () => {
             timestampInput.value = "";
@@ -149,8 +126,13 @@ export class UIController {
             this.robots.setToLive();
         });
 
-        divLive.appendChild(liveBtn);
-        timeline.appendChild(divLive);
+        const divTimespan = document.createElement("div");
+
+        divTimespan.appendChild(timestampInput);
+        divTimespan.appendChild(secondsInput);
+        divTimespan.appendChild(liveBtn);
+        timeline.appendChild(divTimespan);
+
     }
 
     _createSidebar(views) {
@@ -160,10 +142,6 @@ export class UIController {
         sidebar.id = "robot-list";
         sidebar.className = "sidebar";
         sidebar.innerHTML = "";
-
-        const header = document.createElement("h4");
-        header.textContent = "Views";
-        sidebar.appendChild(header);
 
         const ul = document.createElement("ul");
         ul.style.listStyle = "none";
@@ -178,7 +156,7 @@ export class UIController {
 
             const btn = document.createElement("button");
             btn.textContent = viewName;
-            btn.className = "btn btn-sm btn-outline-primary";
+            btn.className = "btn btn-sm btn-primary";
             btn.style.width = "100%";
 
             btn.addEventListener("click", () => {
@@ -198,7 +176,7 @@ export class UIController {
 
         const btn = document.createElement("button");
         btn.textContent = "Toggle Heatmap";
-        btn.className = "btn btn-sm btn-outline-primary";
+        btn.className = "btn btn-sm btn-warning";
         btn.style.width = "100%";
 
         btn.addEventListener("click", () => {

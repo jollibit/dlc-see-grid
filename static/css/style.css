@@ -31,23 +31,24 @@ canvas {
 }
 
 .sidebar {
-  position: absolute; /* or relative if you want flow */
-  top: 0;
+  position: fixed; /* or relative if you want flow */
+  top: 65px;
   bottom: 100px;
   right: 0;
   width: 200px;
-  background: rgba(200,200,200,0.75);
+  background: rgba(200,200,200,0.0);
   overflow-y: auto;
   z-index: 11;
 }
 
 .timeline {
-  position: absolute; /* or relative if you want flow */
+  position: fixed; /* or relative if you want flow */
   bottom: 0;
   right: 0;
   left: 0;
-  height: 100px;
-  background: rgba(255,255,255,0.75);
+  height: 50px;
+  width: 370px;
+  background: rgba(255,255,255,0.0);
   overflow-y: auto;
   z-index: 11;
 }
@@ -61,4 +62,24 @@ button.active {
     background-color: #0d6efd;
     color: white;
     border-color: #0d6efd;
+}
+
+.top-header {
+  position: fixed;
+  height: 60px;  
+  width: 100%;          /* fixed height for the header */
+  min-height: 60px;        /* ensures it doesn’t shrink on small screens */
+  max-height: 60px;        /* prevents it from growing */
+  padding: 0 1rem;         /* optional horizontal padding */
+  background-color: rgba(248, 249, 250, 0.85); /* keep your light bg with opacity */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;           /* ensure it stays on top */
+}
+
+/* Fixed logo size */
+.top-header img {
+  height: 40px;           /* static logo height */
+  width: auto;            /* maintain aspect ratio */
 }
