@@ -5,6 +5,8 @@ export class UIController {
         this.grid = grid;
         this.root = null;
         this.touchInitialDistance = null;
+         this.touchStartX = null;
+        this.touchStartY = null;
     }
 
     init() {
@@ -17,7 +19,10 @@ export class UIController {
         });
 
         window.addEventListener("touchstart", (e) => {
-            if (e.touches.length === 2) {
+            if (e.touches.length === 1) {
+                this.touchStartX = e.touches[0].clientX;
+                this.touchStartY = e.touches[0].clientY;
+            } else if (e.touches.length === 2) {
                 const dx = e.touches[0].clientX - e.touches[1].clientX;
                 const dy = e.touches[0].clientY - e.touches[1].clientY;
                 this.touchInitialDistance = Math.hypot(dx, dy);
@@ -25,15 +30,31 @@ export class UIController {
         });
 
         window.addEventListener("touchmove", (e) => {
-            if (e.touches.length === 2 && this.touchInitialDistance) {
+            if (e.touches.length === 1 && this.touchStartX != null && this.touchStartY != null) {
+                const dx = e.touches[0].clientX - this.touchStartX;
+                const dy = e.touches[0].clientY - this.touchStartY;
+                
+                const moveSpeed = 2;
+
+                const moveX = dx * 0.01 * moveSpeed;
+                const moveY = dy * 0.01 * moveSpeed;
+
+                this.viewController.moveOverview(-moveX, moveY, 0); 
+
+                this.touchStartX = e.touches[0].clientX;
+                this.touchStartY = e.touches[0].clientY;
+            } else if (e.touches.length === 2 && this.touchInitialDistance) {
                 const dx = e.touches[0].clientX - e.touches[1].clientX;
                 const dy = e.touches[0].clientY - e.touches[1].clientY;
                 const currentDistance = Math.hypot(dx, dy);
+                const delta = (currentDistance - this.touchInitialDistance) / this.touchInitialDistance;
+                const zoomSpeed = 2;
+                const zoomFactor = 1 - delta * zoomSpeed;
 
-                const zoomFactor = currentDistance / this.touchInitialDistance;
-                viewController.zoomOverview(zoomFactor);
+                const clampedFactor = Math.min(Math.max(zoomFactor, 0.5), 2);
+                this.viewController.zoomOverview(clampedFactor);
 
-                this.touchInitialDistance = currentDistance; // reset for smooth zoom
+                this.touchInitialDistance = currentDistance;
             }
         });
 

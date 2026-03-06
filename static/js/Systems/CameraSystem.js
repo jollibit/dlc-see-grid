@@ -149,7 +149,7 @@ export class CameraSystem {
 
     zoomOverview(factor) {
         const cam = this.overviewCamera;
-
+        
         cam.orthoLeft   *= factor;
         cam.orthoRight  *= factor;
         cam.orthoTop    *= factor;
