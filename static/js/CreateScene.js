@@ -5,12 +5,18 @@ export async function createScene(engine) {
 
   scene.clearColor = new BABYLON.Color4(0.0, 0.75, 0.85, 1.0);
 
-  const environmentTex = BABYLON.CubeTexture.CreateFromPrefilteredData(
-      "images/environment.env",
-      scene
-  );
+  const hdrTexture = new BABYLON.HDRCubeTexture(
+      "images/workshop.hdr",
+      scene,
+      1024,
+      false,
+      true,
+      false,
+      false
+  )
 
-  scene.environmentTexture = environmentTex;
+  scene.environmentTexture = hdrTexture;
+  scene.environmentIntensity = 0.5;
 
   const backgroundLayer = new BABYLON.Layer(
       "bgLayer",
@@ -25,7 +31,7 @@ export async function createScene(engine) {
     scene
   );
 
-  ambient.intensity = .5;
+  ambient.intensity = .1;
 
   let dirLight = new BABYLON.DirectionalLight(
     "dirLight",
