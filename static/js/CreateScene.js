@@ -25,22 +25,25 @@ export async function createScene(engine) {
   );
 
   backgroundLayer.isBackground = true;
+  
   const ambient = new BABYLON.HemisphericLight(
     "light",
     new BABYLON.Vector3(0, 1, 0),
     scene
   );
 
-  ambient.intensity = .1;
+  ambient.diffuse = new BABYLON.Color3(0.8, 0.9, 1);
+  ambient.intensity = 0.4;
 
-  let dirLight = new BABYLON.DirectionalLight(
+  const dirLight = new BABYLON.DirectionalLight(
     "dirLight",
     new BABYLON.Vector3(0, -2, 1),
     scene
   );
 
   dirLight.position = new BABYLON.Vector3(0, 1000, 0);
-  dirLight.intensity = 1.5;
+  dirLight.diffuse = new BABYLON.Color3(1, 0.95, 0.9);
+  dirLight.intensity = 0.8;  
 
   const shadowGenerator = new BABYLON.CascadedShadowGenerator(2048, dirLight);
   shadowGenerator.numCascades = 6;
@@ -63,6 +66,16 @@ export async function createScene(engine) {
   shadowGenerator.blurKernel = 32;
 
   scene.metadata = { shadowGenerator };
+
+  scene.imageProcessingConfiguration.toneMappingEnabled = true;
+  scene.imageProcessingConfiguration.contrast = 1.5;
+  scene.imageProcessingConfiguration.exposure = 1;
+
+  scene.imageProcessingConfiguration.vignetteEnabled = true;
+  scene.imageProcessingConfiguration.vignetteWeight = 7.5;
+  scene.imageProcessingConfiguration.vignetteColor = new BABYLON.Color4(0, 0, 0, 1);
+  scene.imageProcessingConfiguration.vignetteBlendMode = BABYLON.ImageProcessingConfiguration.VIGNETTEMODE_MULTIPLY;
+  scene.imageProcessingConfiguration.vignetteStretch = 1.0;
 
   //const axes = new BABYLON.AxesViewer(scene, 2);
   
