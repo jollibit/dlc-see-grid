@@ -36,9 +36,6 @@ def build_envelope(topic: str, payload_raw: bytes) -> dict:
     """
     base = {
         "type": "robot",
-        "mqtt_topic": topic,
-        "hall":   HALL,
-        "anchor": ANCHOR,
         "ts":     datetime.now(timezone.utc).isoformat(),
     }
 
@@ -46,10 +43,24 @@ def build_envelope(topic: str, payload_raw: bytes) -> dict:
         try:
             parsed = json.loads(payload_raw.decode("utf-8"))
             # If the payload already contains 'data', keep the structure
-            if "data" in parsed:
-                base.update(parsed)
-            else:
-                base["data"] = parsed
+
+            data = {
+                'x': parsed["position"][2],
+                'y': 0,
+                'z': parsed["position"][3],
+                'name': parsed["name"],
+                'status': parsed['status'],
+                'hall': HALL,
+                'dx': 0,
+                'dy': 0,
+                'dz': 0,
+                'angle': parsed["position"][4],
+                'ts': datetime.now(timezone.utc).isoformat(),
+                'anchor': ANCHOR
+            }
+
+            base["data"] = data
+
         except (json.JSONDecodeError, UnicodeDecodeError) as exc:
             log.warning("Could not parse JSON payload: %s – forwarding raw", exc)
             base["data"] = payload_raw.decode("utf-8", errors="replace")

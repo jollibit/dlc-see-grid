@@ -60,6 +60,7 @@ export class UIController {
 
         window.addEventListener("touchend", (e) => {
             if (e.touches.length < 2) this.touchInitialDistance = null;
+            else if (e.touches.length === 3) this.viewController.rotateOverviewCamera();
         });
 
         window.addEventListener("keydown", (event) => {
