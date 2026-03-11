@@ -5,16 +5,21 @@ from datetime import datetime, timezone
 import random
 import os
 
-MIN_X = -20
-MAX_X = 23.5
+RANGE_X = float(os.getenv("MAX_X", 0))
+ANCHOR_X = float(os.getenv("ANCHOR_X", 0))
+
+MIN_X = 0 - ANCHOR_X
+MAX_X = RANGE_X - ANCHOR_X
 
 Y = 0
 
-MIN_Z = -20
-MAX_Z = 53
+RANGE_Z = float(os.getenv("MAX_Y", 0))
+ANCHOR_Z = float(os.getenv("ANCHOR_Y", 0))
+
+MIN_Z = 0 - ANCHOR_Z
+MAX_Z = RANGE_Z - ANCHOR_Z
 
 ANCHOR = "CORNER"
-
 
 robot_names = ["r_001", "r_002", "r_003", "r_004", "r_005"]
 hall = "main"

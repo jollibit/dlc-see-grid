@@ -35,7 +35,20 @@ export class RoomSystem{
         });
         
         this.room.position = new BABYLON.Vector3(0, 0, 0);
+        
+        let cornerAnchor = result.meshes.find(m => m.name.startsWith("anchor_"));
+        
+        this.anchor = new BABYLON.TransformNode("roomAnchor", this.scene);
+        this.anchor.parent = cornerAnchor;
+        
+        const config = window.APP_CONFIG;
 
-        this.anchor = result.meshes.find(m => m.name.startsWith("anchor_"));
+        const ANCHOR_X = config.ANCHOR_X || 0;
+        const ANCHOR_Z =  config.ANCHOR_Y || 0;
+        const ANCHOR_THETA =  config.ANCHOR_THETA || 0;
+
+        this.anchor.position.x = ANCHOR_X;
+        this.anchor.position.z = ANCHOR_Z;
+        this.anchor.rotationQuaternion = BABYLON.Quaternion.FromEulerAngles(0, BABYLON.Tools.ToRadians(ANCHOR_THETA), 0);    
     }
 }

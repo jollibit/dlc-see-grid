@@ -9,8 +9,15 @@ param(
     [string]$MQTT_USER,
     [string]$MQTT_PASSWORD,
     [string]$PAYLOAD_MODE,
-    [string]$ANCHOR
+    [string]$ANCHOR,
+    [string]$MAX_X,
+    [string]$MAX_Y,
+    [string]$ANCHOR_X,
+    [string]$ANCHOR_Y,
+    [string]$ANCHOR_THETA
 )
+
+$culture = [System.Globalization.CultureInfo]::InvariantCulture
 
 Write-Host "Starting project..."
 
@@ -27,19 +34,39 @@ $envDefaults = @{
     PAYLOAD_MODE   = "json"
     ANCHOR         = "CORNER"
     PROFILE        = "simulator"
+    MAX_X          = "73"
+    MAX_Y          = "43.5"
+    ANCHOR_X       = "20"
+    ANCHOR_Y       = "10"
+    ANCHOR_THETA   = "0"
 }
 
 # ---- OVERRIDE DEFAULTS WITH PARAMETERS ----
 foreach ($key in $envDefaults.Keys) {
     $paramValue = Get-Variable -Name $key -ErrorAction SilentlyContinue
     if ($paramValue -and $paramValue.Value) {
-        Set-Item -Path "Env:$key" -Value $paramValue.Value
+        Set-Item -Path "Env:$key" -Value $paramValue.Value.ToString($culture)
     } elseif (-not ${env:$key}) {
-        Set-Item -Path "Env:$key" -Value $envDefaults[$key]
+        Set-Item -Path "Env:$key" -Value $envDefaults[$key].ToString($culture)
     }
 }
 
 Write-Host "Profile selected: ${env:PROFILE}"
+
+$configPath = "static/config.js"
+
+$configContent = @"
+window.APP_CONFIG = {
+    MAX_X: ${env:MAX_X},
+    MAX_Y: ${env:MAX_Y},
+    ANCHOR_X: ${env:ANCHOR_X},
+    ANCHOR_Y: ${env:ANCHOR_Y},
+    ANCHOR_THETA: ${env:ANCHOR_THETA}
+};
+"@
+
+Set-Content -Path $configPath -Value $configContent
+Write-Host "Generated frontend config at $configPath"
 
 # ---- VENV ----
 if (!(Test-Path ".venv")) {
