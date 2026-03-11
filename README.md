@@ -90,3 +90,17 @@ docker compose restart
 ```
 
 This will restart all containers.
+
+Configure Docker Compose Variables
+
+Windows:
+
+```
+$env:ANCHOR_X = 0 ; $env:ANCHOR_Y = 0 ; docker compose --profile simulator up --build
+```
+
+Linux: 
+
+````
+ANCHOR_X=0; ANCHOR_Y=0; docker compose --profile simulator up --build
+```

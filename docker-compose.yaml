@@ -10,6 +10,11 @@ services:
     restart: unless-stopped
     environment:
       DBI_PULL: tcp://0.0.0.0:5556
+      MAX_X: ${MAX_X:-73}
+      MAX_Y: ${MAX_Y:-43.5}
+      ANCHOR_X: ${ANCHOR_X:-20}
+      ANCHOR_Y: ${ANCHOR_Y:-10}
+      ANCHOR_THETA: ${ANCHOR_THETA:-0}
 
   bridge:
     build: .
@@ -21,6 +26,11 @@ services:
     environment:
       BRIDGE_PULL: tcp://0.0.0.0:5555
       DBI_PUSH: tcp://web:5556
+      MAX_X: ${MAX_X:-73}
+      MAX_Y: ${MAX_Y:-43.5}
+      ANCHOR_X: ${ANCHOR_X:-20}
+      ANCHOR_Y: ${ANCHOR_Y:-10}
+      ANCHOR_THETA: ${ANCHOR_THETA:-0}
 
   # ── activated with: --profile simulator ───────────────────────────────────
   simulator:
@@ -34,6 +44,12 @@ services:
     restart: unless-stopped
     environment:
       BRIDGE_PUSH: tcp://bridge:5555
+      ANCHOR: ${ANCHOR:-CORNER}
+      MAX_X: ${MAX_X:-73}
+      MAX_Y: ${MAX_Y:-43.5}
+      ANCHOR_X: ${ANCHOR_X:-20}
+      ANCHOR_Y: ${ANCHOR_Y:-10}
+      ANCHOR_THETA: ${ANCHOR_THETA:-0}
 
   # ── activated with: --profile connector ───────────────────────────────────
   connector:
@@ -54,3 +70,8 @@ services:
       MQTT_PASSWORD: ${MQTT_PASSWORD:-}
       PAYLOAD_MODE: ${PAYLOAD_MODE:-json}
       ANCHOR: ${ANCHOR:-CORNER}
+      MAX_X: ${MAX_X:-73}
+      MAX_Y: ${MAX_Y:-43.5}
+      ANCHOR_X: ${ANCHOR_X:-20}
+      ANCHOR_Y: ${ANCHOR_Y:-10}
+      ANCHOR_THETA: ${ANCHOR_THETA:-0}
