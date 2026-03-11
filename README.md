@@ -11,75 +11,44 @@ Follow these steps to quickly set up and run the service on your machine.
 ### Manual
 If you want to run it manually follow these steps:
 
-#### 0. Quick Launch
+#### Local Deployment
 
 Just execute the setup file.
 
 Windows:
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-./setup.ps1
+./run.ps1
+```
+
+You can configure variables like this
+```
+./run.ps1 -PROFILE connector
 ```
 
 Linux:
 ```bash
-./setup.sh
+./run.sh
 ```
 
-#### 1. Run Environment on Windows
+Running it without parameter will default to running it with a simple simulator. That is sufficient for testing it. 
+If you want to connect it to your MQTT Broker, use -PROFILE connector and configure the MQTT variables. Keep in mind that that connector needs to be adjusted for your purposes.
 
-Open PowerShell and run:
+Full list or variables and their default values:
 
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.venv\Scripts\activate.ps1
 ```
-
----
-
-#### 2. Install Requirements
-
-```powershell
-python -m pip install -r requirements.txt                    
+    DBI_PULL       = "tcp://0.0.0.0:5556"
+    BRIDGE_PULL    = "tcp://0.0.0.0:5555"
+    BRIDGE_PUSH    = "tcp://localhost:5555"
+    MQTT_BROKER    = "localhost"
+    MQTT_PORT      = "1883"
+    MQTT_TOPIC     = "robots/#"
+    MQTT_USER      = ""
+    MQTT_PASSWORD  = ""
+    PAYLOAD_MODE   = "json"
+    ANCHOR         = "CORNER"
+    PROFILE        = "simulator"
 ```
-
-#### 3. Run the Web-Service
-
-```bash
-uvicorn app.main:app --reload --port 8000
-```
-
-This will start the server on `http://127.0.0.1:8000`.
-
----
-
-#### 4. Run the Bridge
-
-In a new Shell:
-
-```bash
-python -m workers.bridge
-```
-
----
-
-#### 5. Run the Worker Module
-
-In this case, we run the simulator. You can replace it with your custom worker module.
-
-```bash
-python -m workers.simulator         
-```
----
-
-#### 5. Run the Worker Module
-
-In this case, we run the simulator. You can replace it with your custom worker module.
-
-```bash
-python -m app.db_interface.py         
-```
----
 
 ### Docker
 If you want to run it via Docker, follow these steps: 
