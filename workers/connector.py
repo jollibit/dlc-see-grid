@@ -42,19 +42,23 @@ def build_envelope(topic: str, payload_raw: bytes) -> dict:
     if PAYLOAD_MODE == "json":
         try:
             parsed = json.loads(payload_raw.decode("utf-8"))
-            # If the payload already contains 'data', keep the structure
+
+            x = parsed["position"][1]/1000 #mm -> m
+            z = parsed["position"][2]/1000 #mm -> m
+            status = 'ok' if parsed['status'] == 0 else 'error' #correct status
+            angle = parsed["position"][3]/100 # deg/100 -> deg
 
             data = {
-                'x': parsed["position"][2],
+                'x': x,
                 'y': 0,
-                'z': parsed["position"][3],
+                'z': z,
                 'name': parsed["name"],
-                'status': parsed['status'],
+                'status': status,
                 'hall': HALL,
                 'dx': 0,
                 'dy': 0,
                 'dz': 0,
-                'angle': parsed["position"][4],
+                'angle': angle, 
                 'ts': datetime.now(timezone.utc).isoformat(),
                 'anchor': ANCHOR
             }

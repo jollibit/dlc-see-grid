@@ -31,7 +31,7 @@ Linux:
 ./run.sh
 ```
 
-Running it without parameter will default to running it with a simple simulator. That is sufficient for testing it. 
+Running it without parameter will default to running it with a simple simulator. That is sufficient for testing. 
 If you want to connect it to your MQTT Broker, use -PROFILE connector and configure the MQTT variables. Keep in mind that that connector needs to be adjusted for your purposes.
 
 Full list or variables and their default values:
