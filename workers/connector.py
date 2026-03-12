@@ -11,68 +11,61 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-MQTT_BROKER   = os.getenv("MQTT_BROKER",   "localhost")
+MQTT_BROKER   = os.getenv("MQTT_BROKER", "localhost")
 MQTT_PORT     = int(os.getenv("MQTT_PORT", "1883"))
-MQTT_TOPIC    = os.getenv("MQTT_TOPIC",    "robots/#")   # '#' = wildcard
-MQTT_USER     = os.getenv("MQTT_USER",     "")
+MQTT_TOPICS   = os.getenv("MQTT_TOPIC", "robot")
+MQTT_USER     = os.getenv("MQTT_USER", "")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "")
 MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", "zmq_connector")
 
-ZMQ_PUSH_ADDR = os.getenv("BRIDGE_PUSH",  "tcp://127.0.0.1:5555")
-
-# How to interpret the MQTT payload.
-# "raw"  → forward the raw bytes as-is inside the envelope
-# "json" → parse JSON and merge it into the envelope
-PAYLOAD_MODE  = os.getenv("PAYLOAD_MODE", "json")
+ZMQ_PUSH_ADDR = os.getenv("BRIDGE_PUSH", "tcp://127.0.0.1:5555")
 
 HALL = "main"
 ANCHOR = os.getenv("ANCHOR", "CORNER")
 
+# Delimiter for multiple topics in MQTT_TOPIC env variable
+TOPIC_DELIMITER = "|"
 
-def build_envelope(topic: str, payload_raw: bytes) -> dict:
+# map axisType/axisNo to name
+AXIS_MAP = {
+    1: "x",
+    2: "y",
+    3: "angle"
+}
+
+# store temporary data until we have all axes
+robot_buffers = {}
+
+
+def build_combined_envelope(robot_name, axes_data):
     """
-    Wrap an MQTT message in the same envelope the rest of your pipeline
-    already expects.
+    Build a single envelope from the collected axes data.
     """
-    base = {
-        "type": "robot",
-        "ts":     datetime.now(timezone.utc).isoformat(),
+    x = axes_data.get("x", 0.0)
+    z = axes_data.get("y", 0.0)
+    angle = axes_data.get("angle", 0.0)
+
+    data = {
+        "x": x,
+        "y": 0,
+        "z": z,
+        "name": robot_name,
+        "status": "ok",
+        "hall": HALL,
+        "dx": 0,
+        "dy": 0,
+        "dz": 0,
+        "angle": angle,
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "anchor": ANCHOR
     }
 
-    if PAYLOAD_MODE == "json":
-        try:
-            parsed = json.loads(payload_raw.decode("utf-8"))
-
-            x = parsed["position"][1]/1000 #mm -> m
-            z = parsed["position"][2]/1000 #mm -> m
-            status = 'ok' if parsed['status'] == 0 else 'error' #correct status
-            angle = parsed["position"][3]/100 # deg/100 -> deg
-
-            data = {
-                'x': x,
-                'y': 0,
-                'z': z,
-                'name': parsed["name"],
-                'status': status,
-                'hall': HALL,
-                'dx': 0,
-                'dy': 0,
-                'dz': 0,
-                'angle': angle, 
-                'ts': datetime.now(timezone.utc).isoformat(),
-                'anchor': ANCHOR
-            }
-
-            base["data"] = data
-
-        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-            log.warning("Could not parse JSON payload: %s – forwarding raw", exc)
-            base["data"] = payload_raw.decode("utf-8", errors="replace")
-    else:
-        # raw mode
-        base["data"] = payload_raw.decode("utf-8", errors="replace")
-
-    return base
+    envelope = {
+        "type": "robot",
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "data": data
+    }
+    return envelope
 
 
 class MQTTToZMQConnector:
@@ -94,8 +87,11 @@ class MQTTToZMQConnector:
     def _on_connect(self, client, userdata, flags, rc):
         if rc == 0:
             log.info("Connected to MQTT broker %s:%s", MQTT_BROKER, MQTT_PORT)
-            client.subscribe(MQTT_TOPIC)
-            log.info("Subscribed to topic: %s", MQTT_TOPIC)
+            topics = MQTT_TOPICS.split(TOPIC_DELIMITER)
+            for t in topics:
+                t = t.strip()
+                client.subscribe(t)
+                log.info("Subscribed to topic: %s", t)
         else:
             log.error("MQTT connection failed with code %s", rc)
 
@@ -106,25 +102,50 @@ class MQTTToZMQConnector:
             log.info("MQTT disconnected cleanly.")
 
     def _on_message(self, client, userdata, msg):
-        """Called for every message that arrives on the subscribed topic."""
+        """Collect axis messages and send full robot envelope when ready."""
         try:
-            envelope = build_envelope(msg.topic, msg.payload)
-            self._sock.send_json(envelope)
-            log.info(
-                "Forwarded | topic=%-30s | type=%s",
-                msg.topic, envelope.get("type", "?")
-            )
+            payload = json.loads(msg.payload.decode("utf-8"))
+            robot_name = msg.topic.split("/")[-1]
+
+            axis_name = payload.get("name", "").upper()
+            if axis_name.startswith("X_"):
+                axis_type = "x"
+            elif axis_name.startswith("Y_"):
+                axis_type = "y"
+            elif axis_name.startswith("A_"):
+                axis_type = "angle"
+            else:
+                log.warning("Unknown axis name '%s' in message from %s", axis_name, msg.topic)
+                return
+
+            value = payload["position"]["value"]
+
+            if robot_name not in robot_buffers:
+                robot_buffers[robot_name] = {}
+
+            robot_buffers[robot_name][axis_type] = value
+
+            axes_data = robot_buffers[robot_name]
+            if all(k in axes_data for k in ["x", "y", "angle"]):
+                envelope = build_combined_envelope(robot_name, axes_data)
+                self._sock.send_json(envelope)
+                log.info(
+                    "Forwarded combined | robot=%-15s | type=%s",
+                    robot_name,
+                    envelope.get("type", "?")
+                )
+
+                robot_buffers[robot_name] = {}
+
         except Exception as exc:
-            log.exception("Failed to forward message: %s", exc)
+            log.exception("Failed to process message: %s", exc)
 
     def run(self):
         log.info("Connecting to MQTT broker %s:%s …", MQTT_BROKER, MQTT_PORT)
-        # reconnect_delay_set: wait 1 s before first retry, cap at 30 s
         self._client.reconnect_delay_set(min_delay=1, max_delay=30)
         self._client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
 
         try:
-            # loop_forever handles reconnects automatically
             self._client.loop_forever()
         except KeyboardInterrupt:
             log.info("Interrupted – shutting down.")
